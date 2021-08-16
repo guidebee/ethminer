@@ -1,9 +1,12 @@
-/*
- * Wrapper for ADL, inspired by wrapnvml from John E. Stone
+/* Copyright (C) 1883 Thomas Edison - All Rights Reserved
+ * You may use, distribute and modify this code under the
+ * terms of the GPLv3 license, which unfortunately won't be
+ * written for another century.
  *
- * By Philipp Andreas - github@smurfy.de
- * ADL power by Davesmacer
+ * You should have received a copy of the LICENSE file with
+ * this file.
  */
+
 #pragma once
 
 #if defined(__cplusplus)
@@ -31,8 +34,7 @@ typedef void*(ADL_API_CALL* ADL_MAIN_MALLOC_CALLBACK)(int);
 typedef void* ADL_CONTEXT_HANDLE;
 
 #define ADL_MAX_PATH 256
-typedef struct AdapterInfo
-{
+typedef struct AdapterInfo {
     /// \ALL_STRUCT_MEM
 
     /// Size of the structure.
@@ -88,16 +90,14 @@ typedef struct AdapterInfo
 #endif /* (LINUX) */
 } AdapterInfo, *LPAdapterInfo;
 
-typedef struct ADLTemperature
-{
+typedef struct ADLTemperature {
     /// Must be set to the size of the structure
     int iSize;
     /// Temperature in millidegrees Celsius.
     int iTemperature;
 } ADLTemperature;
 
-typedef struct ADLFanSpeedValue
-{
+typedef struct ADLFanSpeedValue {
     /// Must be set to the size of the structure
     int iSize;
     /// Possible valies: \ref ADL_DL_FANCTRL_SPEED_TYPE_PERCENT or \ref
@@ -113,8 +113,7 @@ typedef struct ADLFanSpeedValue
  * Handle to hold the function pointers for the entry points we need,
  * and the shared library itself.
  */
-typedef struct
-{
+typedef struct {
     void* adl_dll;
     int adl_gpucount;
     int log_gpucount;
@@ -146,10 +145,11 @@ int wrap_adl_get_gpu_pci_id(wrap_adl_handle* adlh, int gpuindex, char* idbuf, in
 
 int wrap_adl_get_tempC(wrap_adl_handle* adlh, int gpuindex, unsigned int* tempC);
 
+int wrap_adl_get_mem_tempC(wrap_adl_handle* adlh, int gpuindex, unsigned int* tempC);
+
 int wrap_adl_get_fanpcnt(wrap_adl_handle* adlh, int gpuindex, unsigned int* fanpcnt);
 
 int wrap_adl_get_power_usage(wrap_adl_handle* adlh, int gpuindex, unsigned int* milliwatts);
-
 
 #if defined(__cplusplus)
 }

@@ -15,7 +15,7 @@ where `scheme` can be any of:
 * `stratum2+tcp` for plain stratum NiceHash compatible mode
 
 ## A note about this form of notation
-This notation is called URI notation and gives us great flexibility allowing ethminer to specify all needed arguments per single connection (other miners offer single dedicated CLI arguments which are valid for all connections).
+This notation is called URI notation and gives us great flexibility allowing nsfminer to specify all needed arguments per single connection (other miners offer single dedicated CLI arguments which are valid for all connections).
 An URI is formed like this
 
 ```
@@ -69,13 +69,12 @@ The above samples produce the very same result.
 
 ## Secure socket communications for stratum only
 
-Ethminer supports secure socket communications (where pool implements and offers it) to avoid the risk of a [man-in-the-middle attack](https://en.wikipedia.org/wiki/Man-in-the-middle_attack)
+nsfminer supports secure socket communications (where pool implements and offers it) to avoid the risk of a [man-in-the-middle attack](https://en.wikipedia.org/wiki/Man-in-the-middle_attack)
 To enable it simply replace tcp with either:
 
-* `tls` to enable secure socket communication
-* `ssl` or `tls12` to enable secure socket communication **allowing only TLS 1.2** encryption
+* `ssl` to enable secure socket communication **allowing only TLS 1.2** encryption
 
-thus your connection scheme changes to `-P stratum+tls://[...]` or `-P stratum+tls12://[...]`. Same applies for `stratum1` and `stratum2`.
+thus your connection scheme changes to `-P stratum+tcp://[...]` or `-P stratum+ssl://[...]`. Same applies for `stratum1` and `stratum2`.
 
 ## Special characters in variables
 
@@ -95,7 +94,7 @@ Some examples:
 ## Only for version 0.16+ (older versions not affected)
 
 Stratum autodetection has been introduced to mitigate user's duty to guess/find which stratum flavour to apply (stratum or stratum1 or stratum2).
-If you want to let ethminer do the tests for you simply enter scheme as `stratum://` (note `+tcp` is missing) or `stratums://` for secure socket or `stratumss://` for secure socket **allowing only TLS 1.2** encryption.
+If you want to let nsfminer do the tests for you simply enter scheme as `stratum://` (note `+tcp` is missing) or `stratums://` for secure socket or `stratumss://` for secure socket **allowing only TLS 1.2** encryption.
 
 ## Common samples
 
@@ -131,6 +130,7 @@ The servers are listed in alphabetical order. To get best results reorder them f
 | [dwarfpool.org](#dwarfpoolorg) | <https://dwarfpool.com/> | <https://dwarfpool.com/eth> |
 | [ethermine.org](#ethermineorg) | <https://ethermine.org/> | <https://ethermine.org/> |
 | [ethpool.org](#ethpoolorg) | <https://www.ethpool.org/> | <https://www.ethpool.org/> |
+| [ezil.me](#ezilme) | <https://ezil.me/> | <https://ezil.me/start> |
 | [f2pool.com](#f2poolcom) | <https://www.f2pool.com/> | <https://www.f2pool.com/help/?#tab-content-eth> |
 | [flexpool.io](#flexpoolio) | <https://flexpool.io/> | <https://flexpool.io/docs/getting-started/> |
 | [miningpoolhub.com](#miningpoolhubcom) | <https://miningpoolhub.com/> | <https://ethereum.miningpoolhub.com/> |
@@ -214,6 +214,24 @@ SSL connection:
  -P stratum1+tcp://ETH_WALLET.WORKERNAME@eu1.ethpool.org:3333
  -P stratum1+tcp://ETH_WALLET.WORKERNAME@us1.ethpool.org:3333
  ```
+
+### ezil.me
+
+Non-SSL connection:
+```
+-P stratum1+tcp://ETH_WALLET.ZIL_WALLET.WORKERNAME@asia.ezil.me:5555
+-P stratum1+tcp://ETH_WALLET.ZIL_WALLET.WORKERNAME@us-east.ezil.me:5555
+-P stratum1+tcp://ETH_WALLET.ZIL_WALLET.WORKERNAME@us-west.ezil.me:5555
+-P stratum1+tcp://ETH_WALLET.ZIL_WALLET.WORKERNAME@eu.ezil.me:5555
+```
+
+SSL connection:
+```
+-P stratum1+ssl://ETH_WALLET.ZIL_WALLET.WORKERNAME@asia.ezil.me:25443
+-P stratum1+ssl://ETH_WALLET.ZIL_WALLET.WORKERNAME@us-east.ezil.me:25443
+-P stratum1+ssl://ETH_WALLET.ZIL_WALLET.WORKERNAME@us-west.ezil.me:25443
+-P stratum1+ssl://ETH_WALLET.ZIL_WALLET.WORKERNAME@eu.ezil.me:25443
+```
 
 ### f2pool.com
 

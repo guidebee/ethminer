@@ -1,3 +1,17 @@
+# Copyright (C) 1883 Thomas Edison - All Rights Reserved
+# You may use, distribute and modify this code under the
+# terms of the GPLv3 license, which unfortunately won't be
+# written for another century.
+#
+# You should have received a copy of the LICENSE file with
+# this file. 
+
+if(UNIX)
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+endif()
+
 cmake_minimum_required(VERSION 3.5)
 
 include(cmake/cable/bootstrap.cmake)
@@ -9,29 +23,26 @@ include(HunterGate)
 
 include(defaults/HunterCacheServers)
 
-cable_configure_toolchain(DEFAULT cxx11)
+cable_configure_toolchain(DEFAULT cxx17)
 
 set(HUNTER_CONFIGURATION_TYPES Release CACHE STRING "Build type of Hunter packages")
 set(HUNTER_JOBS_NUMBER 6 CACHE STRING "Number of parallel builds used by Hunter")
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.23.112.tar.gz"
-    SHA1 "4b894e1d5d203f0cc9a77431dbb1b486ab6f4430"
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.304.tar.gz"
+    SHA1 "cae9026e69d7d8333897663688a11f4232fb8826"
     LOCAL
 )
 
-project(ethminer)
-set(PROJECT_VERSION 0.19.0)
+project(nsfminer)
+set(PROJECT_VERSION 1.3.14) # Update version
 
 cable_set_build_type(DEFAULT Release CONFIGURATION_TYPES Release RelWithDebInfo)
 
 option(ETHASHCL "Build with OpenCL mining" ON)
 option(ETHASHCUDA "Build with CUDA mining" ON)
 option(ETHASHCPU "Build with CPU mining (only for development)" OFF)
-option(ETHDBUS "Build with D-Bus support" OFF)
 option(APICORE "Build with API Server support" ON)
-option(BINKERN "Install AMD binary kernels" ON)
 option(DEVBUILD "Log developer metrics" OFF)
-option(USE_SYS_OPENCL "Build with system OpenCL" OFF)
 
 # propagates CMake configuration options to the compiler
 function(configureProject)
@@ -44,37 +55,21 @@ function(configureProject)
     if (ETHASHCPU)
         add_definitions(-DETH_ETHASHCPU)
     endif()
-    if (ETHDBUS)
-        add_definitions(-DETH_DBUS)
-    endif()
     if (APICORE)
         add_definitions(-DAPI_CORE)
-    endif()
-    if (BINKERN)
-        add_definitions(-DBIN_KERN)
     endif()
     if (DEVBUILD)
         add_definitions(-DDEV_BUILD)
     endif()
-    if (USE_SYS_OPENCL)
-        add_definitions(-DUSE_SYS_OPENCL)
-    endif()
 endfunction()
 
-hunter_add_package(Boost COMPONENTS system filesystem thread)
-find_package(Boost CONFIG REQUIRED COMPONENTS system filesystem thread)
+hunter_add_package(Boost COMPONENTS system filesystem thread program_options)
+find_package(Boost CONFIG REQUIRED COMPONENTS system filesystem thread program_options)
 
 hunter_add_package(jsoncpp)
 find_package(jsoncpp CONFIG REQUIRED)
 
-hunter_add_package(ethash)
-find_package(ethash CONFIG REQUIRED)
-
 configureProject()
-
-if(APPLE)
-    set(USE_SYS_OPENCL ON)
-endif()
 
 message("----------------------------------------------------------------------------")
 message("-- CMake ${CMAKE_VERSION}")
@@ -83,43 +78,38 @@ message("----------------------------------------------------------------- compo
 message("-- ETHASHCL         Build OpenCL components                      ${ETHASHCL}")
 message("-- ETHASHCUDA       Build CUDA components                        ${ETHASHCUDA}")
 message("-- ETHASHCPU        Build CPU components (only for development)  ${ETHASHCPU}")
-message("-- ETHDBUS          Build D-Bus components                       ${ETHDBUS}")
 message("-- APICORE          Build API Server components                  ${APICORE}")
-message("-- BINKERN          Install AMD binary kernels                   ${BINKERN}")
 message("-- DEVBUILD         Build with dev logging                       ${DEVBUILD}")
-message("-- USE_SYS_OPENCL   Build with system OpenCL                     ${USE_SYS_OPENCL}")
 message("----------------------------------------------------------------------------")
 message("")
 
 include(EthCompilerSettings)
-if(UNIX AND NOT APPLE)
+if(UNIX)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
 endif()
 
 cable_add_buildinfo_library(PROJECT_NAME ${PROJECT_NAME})
 
-add_subdirectory(libdevcore)
-add_subdirectory(libethcore)
+add_subdirectory(libdev)
+add_subdirectory(libeth)
 add_subdirectory(libhwmon)
-add_subdirectory(libpoolprotocols)
+add_subdirectory(libpool)
+add_subdirectory(ethash)
 
 if (ETHASHCL)
-    add_subdirectory(libethash-cl)
-    if (BINKERN)
-        add_subdirectory(libethash-cl/kernels)
-    endif()
+    add_subdirectory(libcl)
 endif ()
 if (ETHASHCUDA)
-    add_subdirectory(libethash-cuda)
+    add_subdirectory(libcuda)
 endif ()
 if (ETHASHCPU)
-    add_subdirectory(libethash-cpu)
+    add_subdirectory(libcpu)
 endif ()
 if (APICORE)
-    add_subdirectory(libapicore)
+    add_subdirectory(libapi)
 endif()
 
-add_subdirectory(ethminer)
+add_subdirectory(nsfminer)
 
 
 if(WIN32)

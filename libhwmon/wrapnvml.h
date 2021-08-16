@@ -1,17 +1,10 @@
-/*
- * A trivial little dlopen()-based wrapper library for the
- * NVIDIA NVML library, to allow runtime discovery of NVML on an
- * arbitrary system.  This is all very hackish and simple-minded, but
- * it serves my immediate needs in the short term until NVIDIA provides
- * a static NVML wrapper library themselves, hopefully in
- * CUDA 6.5 or maybe sometime shortly after.
+/* Copyright (C) 1883 Thomas Edison - All Rights Reserved
+ * You may use, distribute and modify this code under the
+ * terms of the GPLv3 license, which unfortunately won't be
+ * written for another century.
  *
- * This trivial code is made available under the "new" 3-clause BSD license,
- * and/or any of the GPL licenses you prefer.
- * Feel free to use the code and modify as you see fit.
- *
- * John E. Stone - john.stone@gmail.com
- *
+ * You should have received a copy of the LICENSE file with
+ * this file.
  */
 
 #pragma once
@@ -32,8 +25,7 @@ typedef enum wrap_nvmlReturn_enum { WRAPNVML_SUCCESS = 0 } wrap_nvmlReturn_t;
 typedef void* wrap_nvmlDevice_t;
 
 /* our own version of the PCI info struct */
-typedef struct
-{
+typedef struct {
     char bus_id_str[16]; /* string form of bus info */
     unsigned int domain;
     unsigned int bus;
@@ -46,13 +38,38 @@ typedef struct
     unsigned int res3;
 } wrap_nvmlPciInfo_t;
 
+typedef enum {
+    NVML_VALUE_TYPE_DOUBLE = 0,
+    NVML_VALUE_TYPE_UNSIGNED_INT = 1,
+    NVML_VALUE_TYPE_UNSIGNED_LONG = 2,
+    NVML_VALUE_TYPE_UNSIGNED_LONG_LONG = 3,
+    NVML_VALUE_TYPE_SIGNED_LONG_LONG = 4,
+    NVML_VALUE_TYPE_COUNT
+} wrap_nvmlValueType;
+
+typedef union {
+    double dVal;
+    unsigned int uiVal;
+    unsigned long ulVal;
+    unsigned long long ullVal;
+    signed long long sllVal;
+} wrap_nvmlValue;
+
+typedef struct {
+    unsigned int fieldId;
+    unsigned int scopeId;
+    long long timestamp;
+    long long latencyUsec;
+    wrap_nvmlValueType valueType;
+    int nvmlReturn;
+    wrap_nvmlValue value;
+} wrap_nvmlFieldValue;
 
 /*
  * Handle to hold the function pointers for the entry points we need,
  * and the shared library itself.
  */
-typedef struct
-{
+typedef struct {
     void* nvml_dll;
     int nvml_gpucount;
     unsigned int* nvml_pci_domain_id;
@@ -68,8 +85,8 @@ typedef struct
     wrap_nvmlReturn_t (*nvmlDeviceGetFanSpeed)(wrap_nvmlDevice_t, unsigned int*);
     wrap_nvmlReturn_t (*nvmlDeviceGetPowerUsage)(wrap_nvmlDevice_t, unsigned int*);
     wrap_nvmlReturn_t (*nvmlShutdown)(void);
+    wrap_nvmlReturn_t (*nvmlDeviceGetFieldValues)(wrap_nvmlDevice_t, int, wrap_nvmlFieldValue*);
 } wrap_nvml_handle;
-
 
 wrap_nvml_handle* wrap_nvml_create();
 int wrap_nvml_destroy(wrap_nvml_handle* nvmlh);
@@ -90,6 +107,8 @@ int wrap_nvml_get_gpu_name(wrap_nvml_handle* nvmlh, int gpuindex, char* namebuf,
  */
 int wrap_nvml_get_tempC(wrap_nvml_handle* nvmlh, int gpuindex, unsigned int* tempC);
 
+int wrap_nvml_get_mem_tempC(wrap_nvml_handle* nvmlh, int gpuindex, unsigned int* tempC);
+
 /*
  * Query the current GPU fan speed (percent) from the CUDA device ID
  */
@@ -103,7 +122,6 @@ int wrap_nvml_get_fanpcnt(wrap_nvml_handle* nvmlh, int gpuindex, unsigned int* f
  * If the query is run on an unsupported GPU, this routine will return -1.
  */
 int wrap_nvml_get_power_usage(wrap_nvml_handle* nvmlh, int gpuindex, unsigned int* milliwatts);
-
 
 #if defined(__cplusplus)
 }
